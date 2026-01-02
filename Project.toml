@@ -1,9 +1,15 @@
 name = "ComodoGridap"
 uuid = "891c209a-cf74-4802-9941-c85adcfda257"
-authors = ["Aminofa70 <amin.alibakhshi@upm.es> and contributors"]
 version = "1.0.0-DEV"
+authors = ["Aminofa70 <amin.alibakhshi@upm.es> and contributors"]
+
+[deps]
+GeometryBasics = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
+Gridap = "56d4f2e9-7ea1-5844-9cf6-b9c51ca7ce8e"
 
 [compat]
+GeometryBasics = "0.5.10"
+Gridap = "0.19.7"
 julia = "1.10.10"
 
 [extras]
