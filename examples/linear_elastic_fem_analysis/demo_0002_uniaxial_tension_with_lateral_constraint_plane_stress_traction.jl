@@ -18,6 +18,7 @@ F , V = GridapToComodo(model, quad4)
 labels = get_face_labeling(model)
 add_tag_from_tags!(labels, "left", [1, 3, 7])   
 add_tag_from_tags!(labels, "right", [2, 4, 8])  
+add_tag_from_tags!(labels, "bottom", [1, 2, 5]) 
 
 degree = 2
 Ω  = Triangulation(model)
@@ -27,8 +28,13 @@ dΓ = Measure(Γ, degree)
 
 order = 1
 reffe = ReferenceFE(lagrangian, VectorValue{2,Float64}, order)
-V_0 = TestFESpace(model, reffe, conformity=:H1, dirichlet_tags=["left"])
-U_0 = TrialFESpace(V_0, VectorValue(0.0, 0.0))
+V_0 = TestFESpace(model, reffe, conformity=:H1, 
+    dirichlet_tags = ["left", "bottom"],
+    dirichlet_masks = [(true, false), (false, true)]) 
+
+g1(x) = VectorValue(0.0, 0.0)
+g2(x) = VectorValue(0.0, 0.0)
+U_0 = TrialFESpace(V_0, [g1, g2])
 
 function solveLinearElasticSteps(E, ν, model, traction_vector, numSteps)
 
@@ -59,10 +65,8 @@ function solveLinearElasticSteps(E, ν, model, traction_vector, numSteps)
         op = AffineFEOperator(a, b, U_0, V_0)
         uh = solve(op)
 
-        
         u_vals = uh.(node_coords)
 
-        
         disp_points = Vector{GeometryBasics.Point{2,Float64}}(undef, length(u_vals))
 
         disp_points = [GeometryBasics.Point(u[1], u[2]) for u in vec(u_vals)]
@@ -82,7 +86,6 @@ traction_vector = VectorValue(1e10, 0.0)
 numSteps = 10
 
 UT, UT_mag, ut_mag_max =solveLinearElasticSteps(E, ν, model, traction_vector, numSteps)
-
 
 scale = 3.5
 
