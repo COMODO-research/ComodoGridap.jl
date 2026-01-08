@@ -10,7 +10,7 @@ GLMakie.closeall()
 domain = (0, 1.0, 0,1.0)                                  
 partition = (20,20)                                         
 model = CartesianDiscreteModel(domain, partition)           
-GLMakie.closeall()
+
 
 F , V = GridapToComodo(model, quad4)
 

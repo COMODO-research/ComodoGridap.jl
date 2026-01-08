@@ -3,6 +3,7 @@ using ComodoGridap
 using ComodoGridap.Gridap
 using ComodoGridap.GeometryBasics
 using GLMakie
+using Comodo
 GLMakie.closeall()
 Lx = 1.0 # Length in x-direction
 Ly = 1.0 # Length in y-direction
@@ -19,7 +20,8 @@ M = GeometryBasics.Mesh(V, F)
 fig = Figure(size=(800,600))
 ax = Axis(fig[1,1], aspect=DataAspect(), xlabel="X", ylabel="Y", xgridvisible = false, ygridvisible = false)
 
-poly!(ax, M,color = (:gray, 0.25), strokecolor = :black, strokewidth = 3)
+#poly!(ax, M,color = (:gray, 0.25), strokecolor = :black, strokewidth = 3)
+hp = meshplot!(ax, M, color= :gray,  strokecolor=:black, strokewidth=2.0, shading= false, transparency = false)
 
 
 ### plot the boundary

@@ -7,7 +7,7 @@ using Comodo.GLMakie
 using Comodo.GLMakie.Colors
 using Comodo
 GLMakie.closeall()
-domain = (0, 1.0, 0,1.0)                                  
+domain = (0, 1.0, 0, 1.0)                                  
 partition = (20,20)                                         
 model = CartesianDiscreteModel(domain, partition)           
 
@@ -18,25 +18,19 @@ F , V = GridapToComodo(model, quad4)
 labels = get_face_labeling(model)
 add_tag_from_tags!(labels, "left", [1, 3, 7])   
 add_tag_from_tags!(labels, "right", [2, 4, 8])  
-add_tag_from_tags!(labels, "bottom", [1, 2, 5]) 
 
 degree = 2
 Ω  = Triangulation(model)
 dΩ = Measure(Ω, degree)
-Γ  = BoundaryTriangulation(model, tags="right")
-dΓ = Measure(Γ, degree)
+
 
 order = 1
 reffe = ReferenceFE(lagrangian, VectorValue{2,Float64}, order)
 V_0 = TestFESpace(model, reffe, conformity=:H1, 
-    dirichlet_tags = ["left", "bottom"],
-    dirichlet_masks = [(true, false), (false, true)]) 
+    dirichlet_tags = ["left", "right"],
+    dirichlet_masks = [(true, true), (true, false)]) 
 
-g1(x) = VectorValue(0.0, 0.0)
-g2(x) = VectorValue(0.0, 0.0)
-U_0 = TrialFESpace(V_0, [g1, g2])
-
-function solveLinearElasticSteps(E, ν, model, traction_vector, numSteps)
+function solveLinearElasticSteps(E, ν, model, displacement, numSteps)
 
     λ3d = (E * ν) / ((1 + ν) * (1 - 2 * ν))
     μ = E / (2 * (1 + ν))
@@ -44,6 +38,9 @@ function solveLinearElasticSteps(E, ν, model, traction_vector, numSteps)
 
     σ(ε) = λ * tr(ε) * one(ε) + 2 * μ * ε
     a(u, v) = ∫(ε(v) ⊙ (σ ∘ ε(u))) * dΩ
+
+    
+    b(v) = 0.0
 
     node_coords = Geometry.get_node_coordinates(model)
     numNodes = length(node_coords)
@@ -59,14 +56,19 @@ function solveLinearElasticSteps(E, ν, model, traction_vector, numSteps)
     for step = 1:numSteps-1
         println("Solving step $step of $numSteps")
 
-        t(x) = (step / (numSteps - 1)) * traction_vector
-        b(v) = ∫(v ⋅ t) * dΓ
-
+        
+        disp_x = (step / (numSteps - 1)) * displacement
+        g0 = VectorValue(0.0,0.0)
+        g1 = VectorValue(disp_x,0.0)
+        U_0 = TrialFESpace(V_0, [g0,g1])
+    
         op = AffineFEOperator(a, b, U_0, V_0)
         uh = solve(op)
 
+        
         u_vals = uh.(node_coords)
 
+        
         disp_points = Vector{GeometryBasics.Point{2,Float64}}(undef, length(u_vals))
 
         disp_points = [GeometryBasics.Point(u[1], u[2]) for u in vec(u_vals)]
@@ -80,14 +82,15 @@ function solveLinearElasticSteps(E, ν, model, traction_vector, numSteps)
 end
 
 
-E = 210e9
+E = 500.0e3
 ν = 0.3
-traction_vector = VectorValue(1e10, 0.0)
+displacement = 1.0
 numSteps = 10
 
-UT, UT_mag, ut_mag_max =solveLinearElasticSteps(E, ν, model, traction_vector, numSteps)
+UT, UT_mag, ut_mag_max = solveLinearElasticSteps(E, ν, model, displacement, numSteps)
 
-scale = 3.5
+
+scale = 1.0
 
 VV = [GeometryBasics.Point{2,Float64}(e[1], e[2]) for e in V]
 VT = [VV .+ scale .* UT[i] for i in 1:numSteps]
