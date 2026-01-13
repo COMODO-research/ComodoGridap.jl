@@ -19,6 +19,7 @@ export tri3
 
 export GridapToComodo
 export boundary_nodes
+export ComodoGridap_dir
 include("functions.jl")
 
 end

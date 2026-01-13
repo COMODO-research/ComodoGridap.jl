@@ -53,7 +53,6 @@ end
 Convert a Gridap model to Comodo-style Hex8 mesh data.
 
 """
-
 function GridapToComodo(model, ::Type{Comodo.Hex8})
 
     node_coords = Gridap.Geometry.get_node_coordinates(model)
@@ -80,5 +79,79 @@ function GridapToComodo(model, ::Type{Comodo.Hex8})
     CF_type_uni = CF_type[indUni]
     CFb_type = CF_type_uni[Lb]
 
-    return E , V, F, Fb, CFb_type
+    return E, V, F, Fb, CFb_type
+end
+
+"""
+
+ComodoGridap_dir()
+
+This function simply returns the string for the ComodoGridap.jl path.
+This is helpful for instance to load items, such as meshes, from the `assets`` folder. 
+
+"""
+function ComodoGridap_dir()
+    joinpath(@__DIR__, "..")
+end
+
+
+"""
+    GridapToComodo(model, tri3)
+
+Convert a Gridap model to Comodo-style Triangle (tri3) mesh data.
+
+Returns a tuple `(F, V)` where `F` is a vector of tri faces (with node ordering adjusted)
+and `V` is a vector of 2D vertex coordinates.
+"""
+function GridapToComodo(model, ::Type{tri3})
+
+    node_coords = model.grid.node_coordinates
+    cell_node_ids = model.grid.cell_node_ids
+
+    F = TriangleFace{Int}[]
+    for c in cell_node_ids
+        push!(F, c)
+    end
+
+    V = GeometryBasics.Point{2,Float64}[]
+    for x in node_coords
+        push!(V, (x[1], x[2]))
+    end
+
+    return F, V
+end
+
+"""
+    GridapToComodo(model, Tet4)
+
+Convert a Gridap model to Comodo-style Tet4 mesh data.
+
+"""
+function GridapToComodo(model, ::Type{Comodo.Tet4})
+
+    node_coords = model.grid.node_coordinates
+    cell_node_ids = model.grid.cell_node_ids
+
+    V = GeometryBasics.Point{3,Float64}[]
+    for x in node_coords
+        push!(V, (x[1], x[2], x[3]))
+    end
+
+    E = Comodo.Tet4{Int}[]
+    for c in cell_node_ids
+        push!(E, c)
+    end
+
+    numElements = length(cell_node_ids)
+    F = element2faces(E)
+
+    CF_type = repeat(1:6, numElements)
+
+    F_uni, indUni, c_uni = gunique(F, return_index=Val(true), return_counts=Val(true), sort_entries=true)
+    Lb = isone.(c_uni)
+    Fb = F_uni[Lb]
+    CF_type_uni = CF_type[indUni]
+    CFb_type = CF_type_uni[Lb]
+
+    return E, V, F, Fb, CFb_type
 end
