@@ -10,7 +10,7 @@ GLMakie.closeall()
 fileName_mesh = joinpath(ComodoGridap_dir(),"assets","msh","cube.msh")
 model = GmshDiscreteModel(fileName_mesh)
 
-E , V, F, Fb, CFb_type = GridapToComodo(model, Tet4)
+E , V, F, Fb, CFb_type = GridapToComodo(model)
 
 M = GeometryBasics.Mesh(V, F, normal = face_normals(V, F))
 Mb = GeometryBasics.Mesh(V, Fb, normal = face_normals(V, Fb))

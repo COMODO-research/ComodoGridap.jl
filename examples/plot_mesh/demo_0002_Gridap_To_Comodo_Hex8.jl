@@ -9,7 +9,7 @@ domain = (0, 1, 0, 1, 0, 1)
 partition = (10, 10, 10)
 model = CartesianDiscreteModel(domain, partition)
 
-E , V, F, Fb, CFb_type = GridapToComodo(model, Hex8)
+E , V, F, Fb, CFb_type = GridapToComodo(model)
 
 M = GeometryBasics.Mesh(V, F, normal = face_normals(V, F))
 Mb = GeometryBasics.Mesh(V, Fb, normal = face_normals(V, Fb))

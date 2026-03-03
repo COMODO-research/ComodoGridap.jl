@@ -12,7 +12,7 @@ partition = (20,20)
 model = CartesianDiscreteModel(domain, partition)           
 
 
-F , V = GridapToComodo(model, quad4)
+F , V = GridapToComodo(model)
 
 
 labels = get_face_labeling(model)

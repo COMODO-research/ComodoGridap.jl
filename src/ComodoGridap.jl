@@ -9,17 +9,13 @@ using Comodo
 export Comodo
 export Gridap
 
-struct quad4 end
-struct tri3 end
-export quad4
-export tri3
+export ComodoGridap_dir
 
-# struct Hex8 end
-# export Hex8
+
 
 export GridapToComodo
 export boundary_nodes
-export ComodoGridap_dir
+
 include("functions.jl")
 
 end

@@ -10,7 +10,7 @@ GLMakie.closeall()
 fileName_mesh = joinpath(ComodoGridap_dir(),"assets","msh","plate.msh")
 model = GmshDiscreteModel(fileName_mesh)
 
-F, V = GridapToComodo(model, tri3)
+F, V = GridapToComodo(model)
 
 GLMakie.closeall()
 

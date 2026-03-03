@@ -4,6 +4,7 @@ using ComodoGridap.Gridap
 using ComodoGridap.GeometryBasics
 using GLMakie
 using Comodo
+
 GLMakie.closeall()
 Lx = 1.0 # Length in x-direction
 Ly = 1.0 # Length in y-direction
@@ -13,7 +14,7 @@ domain = (0, Lx, 0,Ly)
 partition = (nx,ny)
 model = CartesianDiscreteModel(domain, partition)
 
-F , V = GridapToComodo(model, quad4)
+F , V = GridapToComodo(model)
 
 M = GeometryBasics.Mesh(V, F)
 
@@ -36,7 +37,7 @@ and 9 is for the domain itself .
 =#
 labels = get_face_labeling(model)
 add_tag_from_tags!(labels, "left",  [1, 3, 7])
-nodes = boundary_nodes(model, quad4; tags="left")
+nodes = boundary_nodes(model; tags="left")
 
 
 scatter!(ax, nodes, color=:red, markersize= 15.0, marker=:xcross, strokecolor=:black, strokewidth=2, label = "Fixed XY")
