@@ -4,6 +4,7 @@ using ComodoGridap.Gridap
 using ComodoGridap.GeometryBasics
 using Comodo
 using GridapGmsh
+using Comodo.GLMakie
 using Comodo.GLMakie.Colors
 GLMakie.closeall()
 
