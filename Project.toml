@@ -11,7 +11,7 @@ Gridap = "56d4f2e9-7ea1-5844-9cf6-b9c51ca7ce8e"
 [compat]
 Comodo = "1.0.3"
 GeometryBasics = "0.5.10"
-Gridap = "0.19.7"
+Gridap = "0.19.7, 0.20"
 julia = "1.10.10"
 
 [extras]
