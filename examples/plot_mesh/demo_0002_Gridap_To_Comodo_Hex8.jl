@@ -1,10 +1,8 @@
-using Revise
-using Comodo
 using ComodoGridap
 using ComodoGridap.Gridap
-using ComodoGridap.GeometryBasics
-using Comodo.GLMakie
-using Comodo.GLMakie.Colors
+using ComodoGridap.Comodo
+using ComodoGridap.Comodo.GLMakie
+using ComodoGridap.Comodo.GLMakie.Colors
 
 GLMakie.closeall()
 domain = (0, 1, 0, 1, 0, 1)
@@ -29,20 +27,15 @@ merge!(model.face_labeling, back_face)
 merge!(model.face_labeling, left_face)
 merge!(model.face_labeling, right_face)
 
-# plot the mesh and boundary condition
-M = GeometryBasics.Mesh(V, F, normal = face_normals(V, F))
-Mb = GeometryBasics.Mesh(V, Fb, normal = face_normals(V, Fb))
-
-GLMakie.closeall()
+## Visualise plot the mesh and boundary conditions
 fig = Figure(size = (1200,800))
 ax  = AxisGeom(fig[1,1], title = "Geometry")
-hp = meshplot!(ax, Mb, color=(Gray(0.95), 0.3),  strokecolor=:black, strokewidth=2.0, shading= true, transparency = true)
+hp = meshplot!(ax, Fb, V, color=(Gray(0.95), 0.3),  strokecolor=:black, strokewidth=2.0, shading= true, transparency = true)
 ### BC
 scatter!(ax, boundary_nodes(model; tags="top"), color=:hotpink, markersize= 15.0, marker=:xcross, strokecolor=:black, strokewidth=2, label = "top")
 scatter!(ax, boundary_nodes(model; tags="bottom"), color=:cyan, markersize= 15.0, marker=:circle, strokecolor=:black, strokewidth=2, label = "bottom")
 axislegend(ax, position=:rb, backgroundcolor=(:white, 0.7), framecolor=:gray)
 axislegend(ax, position=:rb, backgroundcolor=(:white, 0.7), framecolor=:gray)
-
 
 screen = display(GLMakie.Screen(), fig)
 GLMakie.set_title!(screen, "GridapToComodo Hex8")

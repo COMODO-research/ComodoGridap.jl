@@ -1,9 +1,8 @@
-using Revise
 using ComodoGridap
 using ComodoGridap.Gridap
-using ComodoGridap.GeometryBasics
-using GLMakie
-using Comodo
+using ComodoGridap.Comodo
+using ComodoGridap.Comodo.GLMakie
+using ComodoGridap.Comodo.GLMakie.Colors
 
 GLMakie.closeall()
 Lx = 1.0 # Length in x-direction
@@ -39,12 +38,10 @@ merge!(model.face_labeling, right_face)
 merge!(model.face_labeling, bottom_face)
 merge!(model.face_labeling, top_face)
 
-
-# plot the mesh and boundary condition
-M = GeometryBasics.Mesh(V, F)
+## Visualise the mesh and boundary conditions
 fig = Figure(size=(800,600))
 ax = Axis(fig[1,1], aspect=DataAspect(), xlabel="X", ylabel="Y")
-hp = meshplot!(ax, M, color= :gray,  strokecolor=:black, strokewidth=2.0, shading= false, transparency = false)
+hp = meshplot!(ax, F, V, color= :gray,  strokecolor=:black, strokewidth=2.0, shading= false, transparency = false)
 ### BC
 scatter!(ax, boundary_nodes(model; tags="right"), color=:red, markersize= 15.0, marker=:xcross, strokecolor=:black, strokewidth=2, label = "right")
 scatter!(ax, boundary_nodes(model; tags="left"), color=:blue, markersize= 15.0, marker=:xcross, strokecolor=:black, strokewidth=2, label = "left")

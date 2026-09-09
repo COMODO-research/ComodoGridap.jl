@@ -1,25 +1,24 @@
-using Revise
 using ComodoGridap
 using ComodoGridap.Gridap
 using ComodoGridap.Gridap.Geometry
 using ComodoGridap.GeometryBasics
-using Comodo.GLMakie
-using Comodo.GLMakie.Colors
-using Comodo
-GLMakie.closeall()
-domain = (0, 1.0, 0,1.0)                                  
-partition = (20,20)                                         
-model = CartesianDiscreteModel(domain, partition)           
+using ComodoGridap.Comodo
+using ComodoGridap.Comodo.GLMakie
 
-F , V = GridapToComodo(model)
+GLMakie.closeall()
+domain = (0, 1.0, 0, 1.0)
+partition = (20, 20)
+model = CartesianDiscreteModel(domain, partition)
+
+F, V = GridapToComodo(model)
 labels = get_face_labeling(model)
-add_tag_from_tags!(labels, "left", [1, 3, 7])   
-add_tag_from_tags!(labels, "right", [2, 4, 8])  
+add_tag_from_tags!(labels, "left", [1, 3, 7])
+add_tag_from_tags!(labels, "right", [2, 4, 8])
 
 degree = 2
-Ω  = Triangulation(model)
+Ω = Triangulation(model)
 dΩ = Measure(Ω, degree)
-Γ  = BoundaryTriangulation(model, tags="right")
+Γ = BoundaryTriangulation(model, tags="right")
 dΓ = Measure(Γ, degree)
 
 order = 1
@@ -38,7 +37,6 @@ function solveLinearElasticSteps(E, ν, model, traction_vector, numSteps)
 
     node_coords = Geometry.get_node_coordinates(model)
     numNodes = length(node_coords)
-    
 
     U0 = zeros(GeometryBasics.Point{2,Float64}, numNodes)
     U0_mag = zeros(Float64, numNodes)
@@ -47,7 +45,7 @@ function solveLinearElasticSteps(E, ν, model, traction_vector, numSteps)
     UT_mag = [copy(U0_mag) for _ in 1:numSteps]
     ut_mag_max = zeros(Float64, numSteps)
 
-    for step = 1:numSteps-1
+    for step = 1:(numSteps-1)
         println("Solving step $step of $numSteps")
 
         t(x) = (step / (numSteps - 1)) * traction_vector
@@ -56,10 +54,8 @@ function solveLinearElasticSteps(E, ν, model, traction_vector, numSteps)
         op = AffineFEOperator(a, b, U_0, V_0)
         uh = solve(op)
 
-        
         u_vals = uh.(node_coords)
 
-        
         disp_points = Vector{GeometryBasics.Point{2,Float64}}(undef, length(u_vals))
 
         disp_points = [GeometryBasics.Point(u[1], u[2]) for u in vec(u_vals)]
@@ -78,40 +74,39 @@ E = 210e9
 traction_vector = VectorValue(1e10, 0.0)
 numSteps = 10
 
-UT, UT_mag, ut_mag_max =solveLinearElasticSteps(E, ν, model, traction_vector, numSteps)
+UT, UT_mag, ut_mag_max = solveLinearElasticSteps(E, ν, model, traction_vector, numSteps)
 
+## Visualisation
 
 scale = 3.5
 
-VV = [GeometryBasics.Point{2,Float64}(e[1], e[2]) for e in V]
-VT = [VV .+ scale .* UT[i] for i in 1:numSteps]
+VV = [GeometryBasics.Point{2,Float64}(p[1], p[2]) for p in V]
+VT = [VV .+ scale .* U  for U in UT]
 
 min_p = minp([minp(V) for V in VT])
 max_p = maxp([maxp(V) for V in VT])
 
 fig_disp = Figure(size=(1000, 600))
-stepStart = 2  
-ax3 = Axis(fig_disp[1, 1], title="Step: $stepStart")
+stepStart = numSteps
+ax1 = Axis(fig_disp[1, 1], title="Step: $stepStart", limits=(min_p[1], max_p[1], min_p[2], max_p[2]), aspect = DataAspect())
 
-xlims!(ax3, min_p[1], max_p[1])
-ylims!(ax3, min_p[2], max_p[2])
-hp = poly!(ax3, GeometryBasics.Mesh(VT[stepStart], F),
-    strokewidth=2,
-    color=UT_mag[stepStart],
-    transparency=false,
+hp = meshplot!(ax1, F, VT[stepStart], 
+    strokewidth=1.0,
+    color=UT_mag[stepStart],    
     colormap=Reverse(:Spectral),
-    colorrange=(0, maximum(ut_mag_max)))
+    colorrange=(0.0, maximum(ut_mag_max)), 
+    shading=false)
 
-Colorbar(fig_disp[1, 2], hp.plots[1], label="Displacement magnitude [mm]")
+Colorbar(fig_disp[1, 2], hp, label="Displacement magnitude [mm]")
 
 incRange = 1:numSteps
-hSlider = Slider(fig_disp[2, 1], range=incRange, startvalue=stepStart - 1, linewidth=30)
+hSlider = Slider(fig_disp[2, 1], range=incRange, startvalue=stepStart, linewidth=30)
 
 on(hSlider.value) do stepIndex
     hp[1] = GeometryBasics.Mesh(VT[stepIndex], F)
     hp.color = UT_mag[stepIndex]
-    ax3.title = "Step: $stepIndex"
+    ax1.title = "Step: $stepIndex"
 end
 
-slidercontrol(hSlider, ax3)
+# slidercontrol(hSlider, ax1)
 display(GLMakie.Screen(), fig_disp)

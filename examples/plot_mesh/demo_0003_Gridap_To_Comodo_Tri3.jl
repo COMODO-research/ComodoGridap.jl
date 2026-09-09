@@ -1,12 +1,12 @@
-using Revise
 using ComodoGridap
 using ComodoGridap.Gridap
 using ComodoGridap.Gridap.Geometry
-using ComodoGridap.GeometryBasics
-using Comodo
-using GridapGmsh
-using Comodo.GLMakie
-using Comodo.GLMakie.Colors
+using ComodoGridap.Comodo
+using ComodoGridap.Comodo.GLMakie
+using ComodoGridap.Comodo.GLMakie.Colors
+
+using GridapGmsh 
+
 GLMakie.closeall()
 
 fileName_mesh = joinpath(ComodoGridap_dir(),"assets","msh","plate.msh")
@@ -27,11 +27,10 @@ model = UnstructuredDiscreteModel(get_grid(model), topo, labels)
 
 F, V = GridapToComodo(model)
 
-# plot the mesh and boundary condition
-M = GeometryBasics.Mesh(V, F)
+## Visualise the mesh and boundary conditions
 fig = Figure(size=(800,600))
 ax = Axis(fig[1,1], aspect=DataAspect(), xlabel="X", ylabel="Y")
-hp = meshplot!(ax, M, color= :gray,  strokecolor=:black, strokewidth=2.0, shading= false, transparency = false)
+hp = meshplot!(ax, F, V, color= :gray,  strokecolor=:black, strokewidth=2.0, shading= false, transparency = false)
 ### BC
 scatter!(ax, boundary_nodes(model; tags="right"), color=:red, markersize= 15.0, marker=:xcross, strokecolor=:black, strokewidth=2, label = "right")
 scatter!(ax, boundary_nodes(model; tags="left"), color=:blue, markersize= 15.0, marker=:xcross, strokecolor=:black, strokewidth=2, label = "left")

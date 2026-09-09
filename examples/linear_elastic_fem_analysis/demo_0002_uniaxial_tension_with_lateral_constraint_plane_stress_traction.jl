@@ -1,11 +1,10 @@
-using Revise
 using ComodoGridap
 using ComodoGridap.Gridap
 using ComodoGridap.Gridap.Geometry
 using ComodoGridap.GeometryBasics
-using Comodo.GLMakie
-using Comodo.GLMakie.Colors
-using Comodo
+using ComodoGridap.Comodo
+using ComodoGridap.Comodo.GLMakie
+
 GLMakie.closeall()
 domain = (0, 1.0, 0,1.0)                                  
 partition = (20,20)                                         
@@ -85,37 +84,37 @@ numSteps = 10
 
 UT, UT_mag, ut_mag_max =solveLinearElasticSteps(E, ν, model, traction_vector, numSteps)
 
+## Visualisation
+
 scale = 3.5
 
-VV = [GeometryBasics.Point{2,Float64}(e[1], e[2]) for e in V]
-VT = [VV .+ scale .* UT[i] for i in 1:numSteps]
+VV = [GeometryBasics.Point{2,Float64}(p[1], p[2]) for p in V]
+VT = [VV .+ scale .* U  for U in UT]
 
 min_p = minp([minp(V) for V in VT])
 max_p = maxp([maxp(V) for V in VT])
 
 fig_disp = Figure(size=(1000, 600))
-stepStart = 2  
-ax3 = Axis(fig_disp[1, 1], title="Step: $stepStart")
+stepStart = numSteps
+ax1 = Axis(fig_disp[1, 1], title="Step: $stepStart", limits=(min_p[1], max_p[1], min_p[2], max_p[2]), aspect = DataAspect())
 
-xlims!(ax3, min_p[1], max_p[1])
-ylims!(ax3, min_p[2], max_p[2])
-hp = poly!(ax3, GeometryBasics.Mesh(VT[stepStart], F),
-    strokewidth=2,
-    color=UT_mag[stepStart],
-    transparency=false,
+hp = meshplot!(ax1, F, VT[stepStart], 
+    strokewidth=1.0,
+    color=UT_mag[stepStart],    
     colormap=Reverse(:Spectral),
-    colorrange=(0, maximum(ut_mag_max)))
+    colorrange=(0.0, maximum(ut_mag_max)), 
+    shading=false)
 
-Colorbar(fig_disp[1, 2], hp.plots[1], label="Displacement magnitude [mm]")
+Colorbar(fig_disp[1, 2], hp, label="Displacement magnitude [mm]")
 
 incRange = 1:numSteps
-hSlider = Slider(fig_disp[2, 1], range=incRange, startvalue=stepStart - 1, linewidth=30)
+hSlider = Slider(fig_disp[2, 1], range=incRange, startvalue=stepStart, linewidth=30)
 
 on(hSlider.value) do stepIndex
     hp[1] = GeometryBasics.Mesh(VT[stepIndex], F)
     hp.color = UT_mag[stepIndex]
-    ax3.title = "Step: $stepIndex"
+    ax1.title = "Step: $stepIndex"
 end
 
-slidercontrol(hSlider, ax3)
+# slidercontrol(hSlider, ax1)
 display(GLMakie.Screen(), fig_disp)

@@ -1,11 +1,12 @@
-using Revise
 using ComodoGridap
 using ComodoGridap.Gridap
-using ComodoGridap.GeometryBasics
-using Comodo
-using Comodo.GLMakie
+using ComodoGridap.Gridap.Geometry
+using ComodoGridap.Comodo
+using ComodoGridap.Comodo.GLMakie
+using ComodoGridap.Comodo.GLMakie.Colors
+
 using GridapGmsh
-using Comodo.GLMakie.Colors
+
 GLMakie.closeall()
 
 fileName_mesh = joinpath(ComodoGridap_dir(),"assets","msh","cube.msh")
@@ -32,20 +33,15 @@ model = UnstructuredDiscreteModel(get_grid(model), topo, labels)
 
 E , V, F, Fb, CFb_type = GridapToComodo(model)
 
-# plot the mesh and boundary condition
-M = GeometryBasics.Mesh(V, F, normal = face_normals(V, F))
-Mb = GeometryBasics.Mesh(V, Fb, normal = face_normals(V, Fb))
-
-GLMakie.closeall()
+## Visualise the mesh and boundary conditions
 fig = Figure(size = (1200,800))
 ax  = AxisGeom(fig[1,1], title = "Geometry")
-hp = meshplot!(ax, Mb, color=(Gray(0.95), 0.3),  strokecolor=:black, strokewidth=2.0, shading= true, transparency = true)
+hp = meshplot!(ax, Fb, V, color=(Gray(0.95), 0.3),  strokecolor=:black, strokewidth=2.0, transparency = true)
 ### BC
 scatter!(ax, boundary_nodes(model; tags="top"), color=:hotpink, markersize= 15.0, marker=:xcross, strokecolor=:black, strokewidth=2, label = "top")
 scatter!(ax, boundary_nodes(model; tags="bottom"), color=:cyan, markersize= 15.0, marker=:circle, strokecolor=:black, strokewidth=2, label = "bottom")
 axislegend(ax, position=:rb, backgroundcolor=(:white, 0.7), framecolor=:gray)
 axislegend(ax, position=:rb, backgroundcolor=(:white, 0.7), framecolor=:gray)
-
 
 screen = display(GLMakie.Screen(), fig)
 GLMakie.set_title!(screen, "GridapToComodo Tet4")
