@@ -8,5 +8,4 @@
 **A Julia package to combine the powers of [Comodo.jl](https://github.com/COMODO-research/Comodo.jl) and [Gridap.jl](https://github.com/gridap/Gridap.jl)**
 
 # About ComodoGridap.jl
-This Julia package enables one to combine [Comodo.jl](https://github.com/COMODO-research/Comodo.jl) and [Gridap.jl]
-(https://github.com/gridap/Gridap.jl). The latter is a powerful Julia library for finite element analysis, while the former offers powerful geometry processing and meshing tools. In addition, Comodo links with Makie for advanced Julia based visualisation. This library helps brings these capabilities together. Functionality provided here includes the conversion between Comodo meshes to Gridap meshes and vice versa. 
+This Julia package enables one to combine [Comodo.jl](https://github.com/COMODO-research/Comodo.jl) and [Gridap.jl](https://github.com/gridap/Gridap.jl). The latter is a powerful Julia library for finite element analysis, while the former offers powerful geometry processing and meshing tools. In addition, Comodo links with Makie for advanced Julia based visualisation. This library helps brings these capabilities together. Functionality provided here includes the conversion between Comodo meshes to Gridap meshes and vice versa. 
