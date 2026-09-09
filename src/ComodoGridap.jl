@@ -6,6 +6,9 @@ using GeometryBasics
 using Gridap.ReferenceFEs
 using Gridap.Arrays
 using Comodo
+using Gridap.Geometry: GridTopology, FaceLabeling
+using Gridap.ReferenceFEs: get_faces, num_faces, num_cell_dims
+using Gridap.Arrays: UNSET
 
 export Comodo
 export Gridap
@@ -14,8 +17,7 @@ export ComodoGridap_dir
 export GridapToComodo
 export boundary_nodes
 export ComodoToGridap
-export comodo_faces_to_gridap_ids
-export add_boundary_tag!
+export face_labeling_from_faces
 include("functions.jl")
 
 end

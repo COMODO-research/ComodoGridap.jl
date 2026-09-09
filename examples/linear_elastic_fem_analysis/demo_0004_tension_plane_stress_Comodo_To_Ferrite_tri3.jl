@@ -3,37 +3,37 @@ using ComodoGridap
 using ComodoGridap.Gridap
 using ComodoGridap.GeometryBasics
 using GLMakie
-using Comodo
+using ComodoGridap.Comodo
 using Gridap.Geometry
 
 #=
-
-This code is similar to demo_0002
-It aims to check the results for ComodoToFerrite
+This code is similar to demo_0002 It aims to check the results for ComodoToFerrite
 =#
 GLMakie.closeall()
 
 plateDim1 = [1.0, 1.0]
-pointSpacing1 = 0.2
+pointSpacing1 = 0.05
 orientation1 = :up
 F, V, Eb, Cb = triplate(plateDim1, pointSpacing1; orientation=orientation1, return_boundary_edges=Val(true))
 
 model = ComodoToGridap(F, V)
-
-topo = get_grid_topology(model)
-labels = get_face_labeling(model)
-
 
 Fb_bottom = Eb[Cb .== 1]
 Fb_right  = Eb[Cb .== 2]
 Fb_top    = Eb[Cb .== 3]
 Fb_left   = Eb[Cb .== 4]
 
-add_boundary_tag!(labels, topo, Fb_left,   "left")
-add_boundary_tag!(labels, topo, Fb_bottom, "bottom")
-add_boundary_tag!(labels, topo, Fb_right,  "right")
-add_boundary_tag!(labels, topo, Fb_top,    "top")
+topo  = model.grid_topology
 
+bottom_face = face_labeling_from_faces(topo, "bottom", Fb_bottom)
+top_face = face_labeling_from_faces(topo, "top", Fb_top)
+right_face = face_labeling_from_faces(topo, "right", Fb_right)
+left_face = face_labeling_from_faces(topo, "left", Fb_left)
+
+merge!(model.face_labeling, left_face)
+merge!(model.face_labeling, right_face)
+merge!(model.face_labeling, bottom_face)
+merge!(model.face_labeling, top_face)
 
 degree = 2
 Ω  = Triangulation(model)

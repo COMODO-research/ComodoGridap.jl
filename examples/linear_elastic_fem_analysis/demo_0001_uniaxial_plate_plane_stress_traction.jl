@@ -11,10 +11,7 @@ domain = (0, 1.0, 0,1.0)
 partition = (20,20)                                         
 model = CartesianDiscreteModel(domain, partition)           
 
-
 F , V = GridapToComodo(model)
-
-
 labels = get_face_labeling(model)
 add_tag_from_tags!(labels, "left", [1, 3, 7])   
 add_tag_from_tags!(labels, "right", [2, 4, 8])  
