@@ -15,7 +15,7 @@ using Comodo.GeometryBasics
 export Comodo
 export Gridap
 
-# Include funcitons 
+# Include functions 
 include("functions.jl")
 
 # Export functions 
